@@ -1,0 +1,82 @@
+{
+    "name": "SCCP",
+    "n_gpu": 1,
+
+    "arch": {
+        "type": "SegMotionNet",
+        "args": {
+            "in_ch": 3,
+            "out_ch": 2,
+            "height": 112,
+            "width": 112,
+            "is_recurrent": false
+        }
+    },
+    "data_loader": {
+        "type": "SCCPDataLoader",
+        "args":{
+            "train_data_folders": ["Isabela_2018-06-09", "Isabela_2018-06-26", "Isabela_2018-07-09"],
+            "valid_data_folders": [
+                "Isabela_2018-05-09", "Isabela_2018-09-30", "Princeton_2019-08-21"
+            ],
+            "sequence_length": 1,
+            "batch_size": 1,
+            "shuffle": false,
+            "num_workers": 2
+        }
+    },
+    "augmentations": {
+        "type": "Augmentor4SequencesOfImagesAndGT",
+        "args":{
+            "output_size": [112, 112],
+            "rotation_jitter": 0.0,
+            "translation_jitter": 0.0,
+            "crop_proportion": 0.3,
+            "vflip": true,
+            "hflip": true,
+            "brightness_jitter": 0.1,
+            "contrast_jitter": 0.1
+        }
+    },
+    "optimizer": {
+        "type": "Adam",
+        "args":{
+            "lr": 0.001,
+            "weight_decay": 0,
+            "amsgrad": true
+        }
+    },
+    "loss": [{
+        "type": "MRIFlowLoss",
+        "args":{
+            "factor_flow": 1.0,
+            "factor_warp": 0.0
+        }}, {
+        "type": "MRISegmentationLoss",
+        "args":{
+            "factor": 0.01
+        }}],
+    "metrics": [
+        "flow_error_L1",
+        "opencv_flow_error_L1"
+    ],
+    "lr_scheduler": {
+        "type": "StepLR",
+        "args": {
+            "step_size": 50,
+            "gamma": 0.1
+        }
+    },
+    "trainer": {
+        "type": "Trainer",
+        "args": {
+            "epochs": 100,
+            "save_dir": "saved/",
+            "save_period": 1,
+            "verbosity": 2,
+            "monitor": "min val_loss",
+            "early_stop": 10,
+            "tensorboard": true
+        }
+    }
+}

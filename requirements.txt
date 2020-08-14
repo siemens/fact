@@ -1,0 +1,8 @@
+numpy>=1.11.1
+torch>=1.0
+torchvision
+scipy
+matplotlib
+Pillow
+opencv-python>3.4,<4.0
+pandas

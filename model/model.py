@@ -1,0 +1,1 @@
+from model.segmotionnet import SegMotionNet
