@@ -20,7 +20,7 @@
             "dataset_root": "./resources/test_images",
             "train_data_folders": [],
             "valid_data_folders": [
-                "Princeton_TestSamples"
+                "Isabella_TestSamples"
             ],
             "sequence_length": 1,
             "batch_size": 1,
