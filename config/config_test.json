@@ -7,8 +7,8 @@
         "args": {
             "in_ch": 3,
             "out_ch": 2,
-            "height": 112,
-            "width": 112,
+            "height": 224,
+            "width": 224,
             "is_recurrent": false,
             "is_trained_with_backward_consistency": true,
             "is_class_1_only_dynamic": true

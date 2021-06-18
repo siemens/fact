@@ -43,7 +43,7 @@ from utils import read_json, write_json
 
 
 class ConfigParser:
-    def __init__(self, config, resume=None, modification=None, run_id=None):
+    def __init__(self, config, resume=None, modification=None, run_id=None, args=None):
         """
         class to parse configuration json file. Handles hyperparameters for training, initializations of modules, checkpoint saving
         and logging module.
@@ -81,6 +81,7 @@ class ConfigParser:
             1: logging.INFO,
             2: logging.DEBUG
         }
+        self.args = args
 
     @classmethod
     def from_args(cls, args, options=''):
@@ -116,7 +117,7 @@ class ConfigParser:
 
         # parse custom cli options into dictionary
         modification = {opt.target : getattr(args, _get_opt_name(opt.flags)) for opt in options}
-        return cls(config, resume, modification)
+        return cls(config, resume, modification, args=args)
 
     def init_obj(self, name_or_item, module, *args, **kwargs):
         """

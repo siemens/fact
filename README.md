@@ -100,6 +100,7 @@ The folder structure and PyTorch boilerplate is adopted from
 
 ## Usage
 
+### Test
 This repository provides a pre-trained model which can be downloaded from 
 [here](https://drive.google.com/file/d/1Q8JVH6w3jpRwgpE-JafB_cQkuSRKsb9A/view?usp=sharing). 
 Once downloaded, the file `segmotionnet_sccp-data_trained-with-backward-compat.pth` 
@@ -109,32 +110,52 @@ Additionally, this repository also contains some testing images in the folder [`
 
 To test the model, run:
   ```shell
-  python test.py -c config/config_test.json --resume resources/saved_models/segmotionnet_sccp-data_trained-with-backward-compat.pth
+  python test.py --config config/config_test.json --resume resources/saved_models/segmotionnet_sccp-data_trained-with-backward-compat.pth
   ```
 
 Results will be saved in [`saved/`](saved) folder.
+
+To simply infer the cloud coverage from an image, the following command is also provided:
+  ```shell
+  python estimate_cloud_coverage.py --image {path_to_image} --config config/config_test.json --resume resources/saved_models/segmotionnet_sccp-data_trained-with-backward-compat.pth
+  ```
 
 ### Config file format
 Config files are in `.json` format:
 ```javascript
 {
-  "name": "Mnist_LeNet",        // training session name
-  "n_gpu": 1,                   // number of GPUs to use for training.
+  "name": "FACT_NIFAnet",                 // training session name
+  "n_gpu": 1,                             // number of GPUs to use for training.
   
-  "arch": {
-    "type": "MnistModel",       // name of model architecture to train
+  "arch": {                               // architecture parameters  
+    "type": "NifaNet",
     "args": {
-
-    }                
+      "in_ch": 3,                         // input image dimensions
+      "out_ch": 2,
+      "height": 112,
+      "width": 112,
+      "sampling_interval": 10.0,          // camera/pyranometer sampling interval (in seconds)
+      "cloud_probability_threshold": 0.3, // threshold w.r.t. cloud probability
+      "prediction_time_window": 300       // forecasting time window (in seconds)
+    }              
   },
-  "data_loader": {
-    "type": "MnistDataLoader",         // selecting data loader
-    "args":{
-      "data_dir": "data/",             // dataset path
-      "batch_size": 64,                // batch size
-      "shuffle": true,                 // shuffle training data before splitting
-      "validation_split": 0.1          // size of validation dataset. float(portion) or int(number of samples)
-      "num_workers": 2,                // number of cpu processes to be used for data loading
+  "data_loader": {                        // dataset information
+    "type": "SCCPDataLoader",
+    "args": {
+      "train_data_folders": [             // data folders
+        "Rutgers_2020-08-22",
+        "Rutgers_2020-09-01", ...
+      ],
+      "valid_data_folders": [
+        ...
+      ],
+      "load_sun_positions": true,         // provided metadata
+      "load_irradiances": true,
+      "load_base_irradiances": true,
+      "load_metadata": true,
+      "batch_size": 2,                    // batch size
+      "shuffle": true,                    // shuffle training data
+      "num_workers": 2                    // number of cpu processes to be used for data loading
     }
   },
   "optimizer": {
@@ -145,9 +166,32 @@ Config files are in `.json` format:
       "amsgrad": true
     }
   },
-  "loss": "nll_loss",                  // loss
+  "loss": [                           // training losses
+    {
+      "type": "MRIFlowLoss",
+      "args": {
+        "factor_flow": 100.0,
+        "factor_warp": 0.0
+      }
+    },
+    {
+      "type": "MRISegmentationLoss",
+      "args": {
+        "factor": 1.0
+      }
+    },
+    {
+      "type": "IrradiancePredLoss",
+      "args": {
+        "factor": 1.0,
+        "criterion": "mape"
+      }
+    }
+  ],
   "metrics": [
-    "accuracy", "top_k_acc"            // list of metrics to evaluate
+    "mape_irradiances",
+    "frechet_distance_irradiances",
+    "r2_score_irradiances"             // list of metrics to evaluate
   ],                         
   "lr_scheduler": {
     "type": "StepLR",                  // learning rate scheduler
