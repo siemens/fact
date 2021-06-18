@@ -125,7 +125,7 @@ if __name__ == '__main__':
                       help='indices of GPUs to enable (default: all)')
     args.add_argument('-i', '--image',
                       default=os.path.join(PROJECT_ROOT, 'resources', 'test_images',
-                                           'Princeton', 'Princeton_TestSamples', 'test sequence (1).png'),
+                                           'Isabella_TestSamples', 'TestSeq1.png'),
                       type=str,
                       help='path to target sky image (default: image from provided sequence)')
     args.add_argument('-o', '--output',
