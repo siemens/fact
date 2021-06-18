@@ -119,6 +119,7 @@ To simply infer the cloud coverage from an image, the following command is also 
   ```shell
   python estimate_cloud_coverage.py --image {path_to_image} --config config/config_test.json --resume resources/saved_models/segmotionnet_sccp-data_trained-with-backward-compat.pth
   ```
+More details on how to use this script can be found in the PDF user manual in the [`doc/`](doc/) folder.
 
 ### Config file format
 Config files are in `.json` format:
